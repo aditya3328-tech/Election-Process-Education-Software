@@ -1,7 +1,6 @@
-import { GoogleGenAI } from '@google/genai';
-
 const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
-const ai = new GoogleGenAI({ apiKey: API_KEY });
+const MODEL = 'gemini-2.5-flash';
+const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${API_KEY}`;
 
 // Helper for cleaning JSON from AI response
 const cleanJson = (text) => {
@@ -12,31 +11,40 @@ const cleanJson = (text) => {
 };
 
 const safeGenerate = async (prompt, history = []) => {
-  console.log('Generating content with model: gemini-1.5-flash');
-  // Combine history and current prompt into contents
+  console.log('Generating content via REST API with model:', MODEL);
+  
+  // Format contents for the REST API
   const contents = history.map(h => ({
     role: h.role === 'user' ? 'user' : 'model',
     parts: [{ text: h.parts }],
   }));
   
-  // Add the current prompt
+  // Add current prompt
   contents.push({
     role: 'user',
     parts: [{ text: typeof prompt === 'string' ? prompt : JSON.stringify(prompt) }],
   });
 
   try {
-    const response = await ai.models.generateContent({
-      model: 'gemini-1.5-flash',
-      contents: contents,
+    const response = await fetch(API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ contents }),
     });
-    
-    // Handle both response.text() function and response.text property
-    const text = typeof response.text === 'function' ? await response.text() : response.text;
-    if (!text) throw new Error('Empty response from AI');
-    return text;
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error('REST API Error:', errorData);
+      throw new Error(errorData.error?.message || 'API request failed');
+    }
+
+    const data = await response.json();
+    const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || "No response";
+    return reply;
   } catch (err) {
-    console.error('Gemini SDK Error:', err);
+    console.error('REST API Fetch Error:', err);
     throw err;
   }
 };
@@ -47,7 +55,6 @@ export const chatWithAssistant = async (message, history = []) => {
     const text = await safeGenerate(prompt, history);
     return { reply: text };
   } catch (error) {
-    console.error('Error calling chat API:', error);
     return { reply: 'Sorry, I am having trouble connecting to the AI.' };
   }
 };
@@ -62,7 +69,6 @@ export const chatWithElectionAssistant = async (message, history = [], language 
     const text = await safeGenerate(`${systemPrompt}\n\nUser question: ${message}`, history);
     return { reply: text };
   } catch (error) {
-    console.error('Error in electionChatAssistant:', error);
     return {
       reply: isHindi
         ? 'माफ़ करें, कुछ तकनीकी समस्या है। कृपया पुनः प्रयास करें।'
