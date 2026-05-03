@@ -18,14 +18,14 @@ const Home = () => {
       {/* Hero Section */}
       <HeroSection />
 
+      {/* Step-by-Step Voting Guide */}
+      <VotingGuide />
+
       {/* Why Voting Matters Section */}
       <WhyVotingMatters />
 
       {/* Vote Impact Visualizer */}
       <VoteImpact />
-
-      {/* Step-by-Step Voting Guide */}
-      <VotingGuide />
 
       {/* Personalized AI Reason to Vote */}
       <WhyYouVote />
