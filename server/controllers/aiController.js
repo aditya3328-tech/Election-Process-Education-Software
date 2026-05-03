@@ -1,10 +1,13 @@
 const { GoogleGenAI } = require('@google/genai');
 
 // Initialize Gemini API
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || 'dummy_key' });
+const apiKey = process.env.VITE_GEMINI_API_KEY || process.env.GEMINI_API_KEY || 'dummy_key';
+const ai = new GoogleGenAI({ apiKey });
 
-const hasKey = () =>
-  process.env.GEMINI_API_KEY && process.env.GEMINI_API_KEY !== 'your_gemini_api_key_here';
+const hasKey = () => {
+  const key = process.env.VITE_GEMINI_API_KEY || process.env.GEMINI_API_KEY;
+  return key && key !== 'your_gemini_api_key_here';
+};
 
 const safeGenerate = async (prompt) => {
   const response = await ai.models.generateContent({
