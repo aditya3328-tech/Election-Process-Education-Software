@@ -3,12 +3,127 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Send, Bot, User, Loader2, Globe, ChevronDown, Trash2 } from 'lucide-react';
 import { chatWithElectionAssistant } from '../services/geminiService';
 
-// ... (keep constants)
+const QUICK_QUESTIONS = {
+  en: [
+    'How do I register to vote?',
+    'What is the election timeline?',
+    'What are the steps to vote on election day?',
+    'What ID do I need to bring?',
+  ],
+  hi: [
+    'मैं मतदाता पंजीकरण कैसे करूं?',
+    'चुनाव की समय-सीमा क्या है?',
+    'चुनाव के दिन मतदान करने के चरण क्या हैं?',
+    'मुझे कौन सा पहचान पत्र लाना होगा?',
+  ],
+};
+
+const WELCOME_MSG = {
+  en: "Hello! 👋 I'm your VoteWise AI Election Assistant. I can help you understand the election process, timelines, voting steps, and more. Ask me anything!",
+  hi: "नमस्ते! 👋 मैं आपका VoteWise AI चुनाव सहायक हूं। मैं आपको चुनाव प्रक्रिया, समय-सीमा, मतदान के चरण और बहुत कुछ समझने में मदद कर सकता हूं। कुछ भी पूछें!",
+};
+
+const LANG_LABELS = {
+  en: { label: 'English', flag: '🇬🇧', other: 'hi', otherLabel: 'हिंदी', otherFlag: '🇮🇳' },
+  hi: { label: 'हिंदी', flag: '🇮🇳', other: 'en', otherLabel: 'English', otherFlag: '🇬🇧' },
+};
+
+const MessageBubble = ({ msg, index }) => {
+  const isUser = msg.sender === 'user';
+  // Enhanced markdown-like rendering
+  const renderText = (text) => {
+    const lines = text.split('\n');
+    return lines.map((line, i) => {
+      let content = line.trim();
+      if (!content) return <div key={i} className="h-2" />;
+
+      // Headers (### or ####)
+      if (content.startsWith('#')) {
+        const level = (content.match(/^#+/) || [''])[0].length;
+        const text = content.replace(/^#+\s*/, '');
+        return (
+          <h4 key={i} className={`font-bold text-white mt-3 mb-1 ${level <= 3 ? 'text-lg' : 'text-base'}`}>
+            {text}
+          </h4>
+        );
+      }
+
+      // Bullet points
+      if (content.startsWith('* ') || content.startsWith('• ') || content.startsWith('- ')) {
+        const text = content.replace(/^(\*|•|-)\s/, '');
+        // Handle bold inside bullet
+        const parts = text.split(/(\*\*.*?\*\*)/g);
+        return (
+          <div key={i} className="flex gap-2 my-1.5 group">
+            <span className="mt-1.5 text-purple-400 flex-shrink-0 w-1.5 h-1.5 rounded-full bg-purple-500 shadow-[0_0_8px_rgba(168,85,247,0.6)]" />
+            <span className="text-slate-200">
+              {parts.map((part, pi) => 
+                part.startsWith('**') && part.endsWith('**') 
+                  ? <strong key={pi} className="text-white font-semibold">{part.slice(2, -2)}</strong> 
+                  : part
+              )}
+            </span>
+          </div>
+        );
+      }
+
+      // Bold text handling for regular lines
+      const parts = content.split(/(\*\*.*?\*\*)/g);
+      return (
+        <p key={i} className="my-1 text-slate-300 leading-relaxed">
+          {parts.map((part, pi) => 
+            part.startsWith('**') && part.endsWith('**') 
+              ? <strong key={pi} className="text-white font-semibold">{part.slice(2, -2)}</strong> 
+              : part
+          )}
+        </p>
+      );
+    });
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 16, scale: 0.98 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ duration: 0.3, ease: [0.23, 1, 0.32, 1] }}
+      className={`flex gap-3 ${isUser ? 'justify-end' : 'justify-start'}`}
+    >
+      {!isUser && (
+        <div className="flex-shrink-0 w-9 h-9 rounded-xl bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-purple-500/20 self-end mb-1">
+          <Bot className="w-5 h-5 text-white" />
+        </div>
+      )}
+      <div
+        className={`max-w-[85%] md:max-w-[75%] p-4 px-5 text-[14.5px] shadow-xl relative group ${
+          isUser
+            ? 'bg-gradient-to-br from-purple-600 to-indigo-700 text-white rounded-2xl rounded-tr-sm'
+            : 'bg-slate-800/90 backdrop-blur-sm border border-white/10 text-slate-100 rounded-2xl rounded-tl-sm'
+        }`}
+      >
+        {renderText(msg.text)}
+        
+        {/* Subtle glass effect for AI messages */}
+        {!isUser && (
+          <div className="absolute inset-0 bg-gradient-to-tr from-white/5 to-transparent pointer-events-none rounded-2xl" />
+        )}
+      </div>
+      {isUser && (
+        <div className="flex-shrink-0 w-9 h-9 rounded-xl bg-slate-700 flex items-center justify-center shadow-md self-end mb-1 border border-white/5">
+          <User className="w-5 h-5 text-slate-300" />
+        </div>
+      )}
+    </motion.div>
+  );
+};
 
 const ChatBox = ({ language, onLanguageChange }) => {
   const [messages, setMessages] = useState(() => {
     const saved = localStorage.getItem('votewise_chat_history');
-    return saved ? JSON.parse(saved) : [{ text: WELCOME_MSG[language], sender: 'ai' }];
+    try {
+      return saved ? JSON.parse(saved) : [{ text: WELCOME_MSG[language], sender: 'ai' }];
+    } catch (e) {
+      return [{ text: WELCOME_MSG[language], sender: 'ai' }];
+    }
   });
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -31,8 +146,6 @@ const ChatBox = ({ language, onLanguageChange }) => {
   useEffect(() => {
     if (prevLang.current !== language) {
       prevLang.current = language;
-      // If messages only have welcome or it's been cleared, don't duplicate too much
-      // But usually just adding a new welcome in new language is good
       setMessages(prev => [
         ...prev,
         { text: WELCOME_MSG[language], sender: 'ai' },
