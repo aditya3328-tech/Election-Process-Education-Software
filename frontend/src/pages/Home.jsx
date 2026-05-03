@@ -7,6 +7,7 @@ import FAQ from '../components/FAQ';
 import CivicTip from '../components/CivicTip';
 import SmartAction from '../components/SmartAction';
 import BiasDetector from '../components/BiasDetector';
+import VotingGuide from '../components/VotingGuide';
 
 const Home = () => {
   return (
@@ -22,6 +23,9 @@ const Home = () => {
 
       {/* Vote Impact Visualizer */}
       <VoteImpact />
+
+      {/* Step-by-Step Voting Guide */}
+      <VotingGuide />
 
       {/* Personalized AI Reason to Vote */}
       <WhyYouVote />

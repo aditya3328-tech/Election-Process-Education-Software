@@ -56,8 +56,8 @@ exports.electionChatAssistant = async (req, res) => {
     }
 
     const systemPrompt = isHindi
-      ? `आप VoteWise AI हैं — एक सरल और मित्रवत चुनाव सहायक। भारतीय नागरिकों को चुनाव प्रक्रिया, मतदाता पंजीकरण, चुनाव की समय-सीमा और मतदान के चरण सरल हिंदी में समझाएं। जब ज़रूरी हो bullet points का उपयोग करें। जटिल शब्दों से बचें।`
-      : `You are VoteWise AI — a friendly Election Assistant. Help citizens understand the election process, voter registration, election timelines, and voting steps in simple English. Use bullet points when listing steps. Avoid political jargon.`;
+      ? `आप VoteWise AI हैं। नागरिकों को चुनाव प्रक्रिया सरल हिंदी में समझाएं।\nनियम:\n- उत्तर बहुत छोटा और केवल मुख्य बिंदुओं (bullet points) में दें।\n- एक बार में 4-5 बिंदुओं से ज़्यादा न लिखें।\n- जटिल शब्दों से बचें और उत्तर को आकर्षक बनाएं।`
+      : `You are VoteWise AI. Help citizens understand the election process in simple English.\nRules:\n- Keep responses very concise and use ONLY bullet points for the main info.\n- Limit yourself to 4-5 points per response.\n- Avoid jargon and make it visually easy to read.`;
 
     const text = await safeGenerate(`${systemPrompt}\n\nUser question: ${message}`);
     return res.status(200).json({ reply: text });
