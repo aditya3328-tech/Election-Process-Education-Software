@@ -1,6 +1,13 @@
 const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
-const MODEL = 'gemini-2.5-flash';
-const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${API_KEY}`;
+const MODEL = 'gemini-1.5-flash';
+
+const getApiUrl = () => {
+  if (!API_KEY) {
+    console.warn('VITE_GEMINI_API_KEY is missing. AI features will not work.');
+    return '';
+  }
+  return `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${API_KEY}`;
+};
 
 // Helper for cleaning JSON from AI response
 const cleanJson = (text) => {
@@ -25,8 +32,11 @@ const safeGenerate = async (prompt, history = []) => {
     parts: [{ text: typeof prompt === 'string' ? prompt : JSON.stringify(prompt) }],
   });
 
+  const apiUrl = getApiUrl();
+  if (!apiUrl) throw new Error('API Key missing');
+
   try {
-    const response = await fetch(API_URL, {
+    const response = await fetch(apiUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
