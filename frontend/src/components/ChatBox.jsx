@@ -181,7 +181,7 @@ const ChatBox = ({ language, onLanguageChange }) => {
   const quickQs = QUICK_QUESTIONS[language];
 
   return (
-    <div className="flex flex-col h-[75vh] max-h-[700px] bg-slate-900/60 backdrop-blur-xl border border-white/10 rounded-3xl shadow-2xl overflow-hidden relative">
+    <div className="flex flex-col h-[82vh] max-h-[900px] bg-slate-900/60 backdrop-blur-xl border border-white/10 rounded-3xl shadow-2xl overflow-hidden relative">
 
       {/* Header */}
       <div className="flex items-center justify-between px-5 py-4 border-b border-white/10 bg-slate-900/80 backdrop-blur-md flex-shrink-0">
