@@ -7,8 +7,6 @@ import FAQ from '../components/FAQ';
 import CivicTip from '../components/CivicTip';
 import SmartAction from '../components/SmartAction';
 import BiasDetector from '../components/BiasDetector';
-import FakeNewsChecker from '../components/FakeNewsChecker';
-import VotingReport from '../components/VotingReport';
 
 const Home = () => {
   return (
@@ -40,8 +38,6 @@ const Home = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <SmartAction />
             <BiasDetector />
-            <FakeNewsChecker />
-            <VotingReport />
           </div>
         </div>
       </section>

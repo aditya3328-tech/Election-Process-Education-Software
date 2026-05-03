@@ -9,7 +9,6 @@ const Navbar = () => {
     { name: 'Home', path: '/' },
     { name: 'Chat AI', path: '/chat' },
     { name: 'Analyzer', path: '/analyzer' },
-    { name: 'Compare', path: '/compare' },
   ];
 
   return (
