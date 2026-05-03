@@ -26,6 +26,50 @@ exports.chatAssistant = async (req, res) => {
   }
 };
 
+exports.electionChatAssistant = async (req, res) => {
+  try {
+    const { message, history, language } = req.body;
+    const isHindi = language === 'hi';
+
+    const systemPrompt = isHindi
+      ? `आप VoteWise AI हैं — एक सरल और मित्रवत चुनाव सहायक। आपका काम है भारतीय नागरिकों को चुनाव प्रक्रिया, मतदाता पंजीकरण, चुनाव की समय-सीमा और मतदान के चरण समझाना।
+नियम:
+- हमेशा सरल हिंदी में उत्तर दें (अंग्रेज़ी शब्द कम से कम उपयोग करें)
+- जब भी ज़रूरी हो bullet points का उपयोग करें
+- जटिल राजनीतिक शब्दों से बचें
+- छोटे, स्पष्ट और सहायक उत्तर दें
+- केवल चुनाव/मतदान से संबंधित प्रश्नों का उत्तर दें`
+      : `You are VoteWise AI — a friendly and simple Election Assistant. Your role is to help citizens understand the election process, voter registration, election timelines, and voting steps.
+Rules:
+- Always respond in simple, clear English
+- Use bullet points when listing steps or multiple items
+- Avoid complex political jargon
+- Keep responses concise and helpful
+- Only answer questions related to elections and voting`;
+
+    if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY === 'your_gemini_api_key_here') {
+      const mock = isHindi
+        ? `[Mock] "${message}" के बारे में: भारत में मतदान करने के लिए आपको मतदाता सूची में अपना नाम दर्ज करवाना होता है। आप voter.eci.gov.in पर ऑनलाइन पंजीकरण कर सकते हैं।`
+        : `[Mock] About "${message}": To vote in India, you need to be registered on the electoral roll. You can register online at voter.eci.gov.in. On election day, bring your Voter ID card to your designated polling booth.`;
+      return res.status(200).json({ reply: mock });
+    }
+
+    const prompt = `${systemPrompt}
+
+User question: ${message}`;
+
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: prompt,
+    });
+
+    res.status(200).json({ reply: response.text });
+  } catch (error) {
+    console.error('Error in electionChatAssistant:', error);
+    res.status(500).json({ error: 'Failed to process election chat' });
+  }
+};
+
 exports.analyzePersonality = async (req, res) => {
   try {
     const { answers } = req.body;

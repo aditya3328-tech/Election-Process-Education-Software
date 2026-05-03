@@ -5,6 +5,9 @@ const aiController = require('../controllers/aiController');
 // Chat assistant route
 router.post('/chat', aiController.chatAssistant);
 
+// Election-specific multilingual chat
+router.post('/election-chat', aiController.electionChatAssistant);
+
 // Voting personality analyzer
 router.post('/analyze-personality', aiController.analyzePersonality);
 

@@ -18,6 +18,25 @@ export const chatWithAssistant = async (message, history = []) => {
   }
 };
 
+export const chatWithElectionAssistant = async (message, history = [], language = 'en') => {
+  try {
+    const response = await fetch(`${API_URL}/election-chat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message, history, language }),
+    });
+    if (!response.ok) throw new Error('Network response was not ok');
+    return await response.json();
+  } catch (error) {
+    console.error('Error calling election-chat API:', error);
+    return {
+      reply: language === 'hi'
+        ? 'माफ़ करें, सर्वर से कनेक्ट करने में समस्या हो रही है।'
+        : 'Sorry, I am having trouble connecting to the server.',
+    };
+  }
+};
+
 export const analyzeVotingPersonality = async (answers) => {
   try {
     const response = await fetch(`${API_URL}/analyze-personality`, {
