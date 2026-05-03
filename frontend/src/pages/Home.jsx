@@ -19,16 +19,24 @@ const Home = () => {
       <HeroSection />
 
       {/* Step-by-Step Voting Guide */}
-      <VotingGuide />
+      <div id="voting-guide">
+        <VotingGuide />
+      </div>
 
       {/* Why Voting Matters Section */}
-      <WhyVotingMatters />
+      <div id="why-voting-matters">
+        <WhyVotingMatters />
+      </div>
 
       {/* Vote Impact Visualizer */}
-      <VoteImpact />
+      <div id="vote-impact">
+        <VoteImpact />
+      </div>
 
       {/* Personalized AI Reason to Vote */}
-      <WhyYouVote />
+      <div id="personalized-reason">
+        <WhyYouVote />
+      </div>
 
       {/* VoteWise AI Toolkit Grid */}
       <section className="relative py-24 overflow-hidden">
