@@ -12,6 +12,7 @@ const cleanJson = (text) => {
 };
 
 const safeGenerate = async (prompt, history = []) => {
+  console.log('Generating content with model: gemini-1.5-flash');
   // Combine history and current prompt into contents
   const contents = history.map(h => ({
     role: h.role === 'user' ? 'user' : 'model',
@@ -24,12 +25,20 @@ const safeGenerate = async (prompt, history = []) => {
     parts: [{ text: typeof prompt === 'string' ? prompt : JSON.stringify(prompt) }],
   });
 
-  const response = await ai.models.generateContent({
-    model: 'gemini-2.5-flash',
-    contents: contents,
-  });
-  
-  return response.text();
+  try {
+    const response = await ai.models.generateContent({
+      model: 'gemini-1.5-flash',
+      contents: contents,
+    });
+    
+    // Handle both response.text() function and response.text property
+    const text = typeof response.text === 'function' ? await response.text() : response.text;
+    if (!text) throw new Error('Empty response from AI');
+    return text;
+  } catch (err) {
+    console.error('Gemini SDK Error:', err);
+    throw err;
+  }
 };
 
 export const chatWithAssistant = async (message, history = []) => {
