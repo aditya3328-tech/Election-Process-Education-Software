@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Brain, CheckCircle2, ChevronRight, RefreshCw, Sparkles, TrendingUp, AlertCircle, Compass } from 'lucide-react';
 
 const questions = [
@@ -100,9 +100,20 @@ const resultsData = {
 
 const PersonalityAnalyzer = () => {
   const [currentStep, setCurrentStep] = useState(0);
-  const [answers, setAnswers] = useState([]);
+  const [answers, setAnswers] = useState(() => {
+    const saved = localStorage.getItem('votewise_analyzer_answers');
+    return saved ? JSON.parse(saved) : [];
+  });
   const [selectedOption, setSelectedOption] = useState(null);
-  const [showResult, setShowResult] = useState(false);
+  const [showResult, setShowResult] = useState(() => {
+    return localStorage.getItem('votewise_analyzer_show_result') === 'true';
+  });
+
+  // Persist state to localStorage
+  useEffect(() => {
+    localStorage.setItem('votewise_analyzer_answers', JSON.stringify(answers));
+    localStorage.setItem('votewise_analyzer_show_result', showResult);
+  }, [answers, showResult]);
 
   const handleNext = () => {
     if (!selectedOption) return;
@@ -141,6 +152,8 @@ const PersonalityAnalyzer = () => {
     setAnswers([]);
     setSelectedOption(null);
     setShowResult(false);
+    localStorage.removeItem('votewise_analyzer_answers');
+    localStorage.removeItem('votewise_analyzer_show_result');
   };
 
   const progressPercentage = ((currentStep) / questions.length) * 100;
