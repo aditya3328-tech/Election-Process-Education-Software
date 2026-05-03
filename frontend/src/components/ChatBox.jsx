@@ -201,7 +201,7 @@ const ChatBox = ({ language, onLanguageChange }) => {
     <div className="flex flex-col h-[82vh] max-h-[900px] bg-slate-900/60 backdrop-blur-xl border border-white/10 rounded-3xl shadow-2xl overflow-hidden relative">
 
       {/* Header */}
-      <div className="flex items-center justify-between px-5 py-4 border-b border-white/10 bg-slate-900/80 backdrop-blur-md flex-shrink-0">
+      <div className="flex items-center justify-between px-5 py-4 border-b border-white/10 bg-slate-900/80 backdrop-blur-md flex-shrink-0 z-40">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center">
             <Bot className="w-4 h-4 text-white" />
@@ -232,7 +232,7 @@ const ChatBox = ({ language, onLanguageChange }) => {
                   initial={{ opacity: 0, scale: 0.9, y: 10 }}
                   animate={{ opacity: 1, scale: 1, y: 0 }}
                   exit={{ opacity: 0, scale: 0.9, y: 10 }}
-                  className="absolute right-0 top-full mt-2 p-3 bg-slate-800 border border-white/10 rounded-2xl shadow-2xl z-30 min-w-[200px]"
+                  className="absolute right-0 top-full mt-2 p-3 bg-slate-800 border border-white/10 rounded-2xl shadow-2xl z-50 min-w-[200px]"
                 >
                   <p className="text-xs text-slate-300 mb-3 font-medium">
                     {language === 'hi' ? 'क्या आप चैट मिटाना चाहते हैं?' : 'Clear all chat history?'}
